@@ -1,0 +1,19 @@
+{
+  "name": "dealdash",
+  "private": true,
+  "version": "1.0.0",
+  "description": "DealDash Australia monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.14"
+  }
+}
