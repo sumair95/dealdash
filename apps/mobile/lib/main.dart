@@ -51,10 +51,18 @@ Future<void> main() async {
 
 Future<void> _runApp() async {
   final container = ProviderContainer();
-  await container.read(analyticsServiceProvider).init();
-  await container.read(adServiceProvider).init();
-  await container.read(stripeServiceProvider).init();
-  await container.read(notificationServiceProvider).init();
+  for (final init in [
+    () => container.read(analyticsServiceProvider).init(),
+    () => container.read(adServiceProvider).init(),
+    () => container.read(stripeServiceProvider).init(),
+    () => container.read(notificationServiceProvider).init(),
+  ]) {
+    try {
+      await init();
+    } catch (error, stackTrace) {
+      debugPrint('Optional service init failed: $error\n$stackTrace');
+    }
+  }
 
   runApp(
     UncontrolledProviderScope(

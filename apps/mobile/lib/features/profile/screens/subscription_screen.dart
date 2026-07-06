@@ -26,12 +26,12 @@ class SubscriptionScreen extends ConsumerWidget {
               children: [
                 Text('Current plan: ${user.subscriptionStatus}'),
                 const SizedBox(height: 16),
-                Card(
+                const Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Premium features'),
                         SizedBox(height: 8),
                         Text('Unlimited searches'),
@@ -43,7 +43,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Price: ${AppConstants.premiumPriceLabel}'),
+                const Text('Price: ${AppConstants.premiumPriceLabel}'),
                 const Spacer(),
                 if (!user.isPremium)
                   SizedBox(

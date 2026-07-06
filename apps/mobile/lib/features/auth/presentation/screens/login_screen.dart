@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
+import '../../../onboarding/providers/onboarding_provider.dart';
 import '../widgets/social_auth_buttons.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,6 +41,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _emailController.text.trim(),
             _passwordController.text,
           );
+      final userId = ref.read(supabaseServiceProvider).currentAuthUser?.id;
+      if (userId != null) {
+        await ref.read(onboardingProvider.notifier).saveAllPreferences(userId);
+      }
       if (mounted) context.go('/home');
     } catch (e) {
       setState(() => _error = e.toString());

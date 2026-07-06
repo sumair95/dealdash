@@ -74,16 +74,36 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
   }
 
   Future<void> saveRetailers(String userId) async {
+    if (state.selectedRetailerIds.isEmpty) return;
     await _supabase.updateUserPreferences(userId, {
       'favourite_retailer_ids': state.selectedRetailerIds.toList(),
     });
   }
 
   Future<void> saveCategories(String userId) async {
+    if (state.selectedCategoryIds.isEmpty) return;
     await _supabase.updateUserPreferences(userId, {
       'favourite_category_ids': state.selectedCategoryIds.toList(),
     });
   }
+
+  Future<void> saveAllPreferences(String userId) async {
+    final updates = <String, dynamic>{};
+    if (state.selectedRetailerIds.isNotEmpty) {
+      updates['favourite_retailer_ids'] = state.selectedRetailerIds.toList();
+    }
+    if (state.selectedCategoryIds.isNotEmpty) {
+      updates['favourite_category_ids'] = state.selectedCategoryIds.toList();
+    }
+    if (updates.isEmpty) return;
+    await _supabase.updateUserPreferences(userId, updates);
+  }
+
+  bool get hasStoreSelection => state.selectedRetailerIds.isNotEmpty;
+
+  bool get hasCategorySelection => state.selectedCategoryIds.isNotEmpty;
+
+  bool get isOnboardingComplete => hasStoreSelection && hasCategorySelection;
 }
 
 final onboardingProvider =

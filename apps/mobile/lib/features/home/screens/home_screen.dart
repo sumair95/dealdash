@@ -114,7 +114,7 @@ class HomeDashboard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SectionHeader(title: AppStrings.todaysBestDeals),
+                const SectionHeader(title: AppStrings.todaysBestDeals),
                 SizedBox(
                   height: 320,
                   child: ListView.builder(
@@ -124,9 +124,9 @@ class HomeDashboard extends ConsumerWidget {
                     itemBuilder: (_, index) => DealCard(deal: deals[index]),
                   ),
                 ),
-                SectionHeader(title: AppStrings.trendingDiscounts),
+                const SectionHeader(title: AppStrings.trendingDiscounts),
                 ...deals.take(6).map((deal) => DealCardHorizontal(deal: deal)),
-                SectionHeader(title: AppStrings.endingSoon),
+                const SectionHeader(title: AppStrings.endingSoon),
                 endingSoonAsync.when(
                   loading: () => const Padding(
                     padding: EdgeInsets.all(16),

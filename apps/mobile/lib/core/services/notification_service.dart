@@ -15,6 +15,7 @@ class NotificationService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   Future<void> init() async {
+    if (kIsWeb) return;
     await _messaging.requestPermission();
     final token = await _messaging.getToken();
     final userId = _supabase.currentAuthUser?.id;

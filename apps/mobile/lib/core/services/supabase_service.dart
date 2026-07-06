@@ -160,7 +160,10 @@ class SupabaseService {
   }
 
   Future<void> updateUserPreferences(String userId, Map<String, dynamic> prefs) async {
-    await client.from('user_preferences').update(prefs).eq('user_id', userId);
+    await client.from('user_preferences').upsert(
+      {'user_id': userId, ...prefs},
+      onConflict: 'user_id',
+    );
   }
 
   Future<Map<String, dynamic>> checkFreemiumGate({

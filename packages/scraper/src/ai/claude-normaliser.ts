@@ -51,8 +51,12 @@ export async function normaliseWithClaude(
 
   const message = await retry(() =>
     client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 4096,
+      // Structured extraction against a fixed schema — no reasoning needed.
+      // Sonnet 5 runs adaptive thinking when `thinking` is omitted, so disable
+      // it explicitly to keep this nightly, high-volume call fast and cheap.
+      thinking: { type: "disabled" },
       system: SYSTEM_PROMPT,
       messages: [
         {
@@ -88,8 +92,9 @@ export async function generateNotificationCopy(
 ): Promise<{ title: string; body: string }> {
   const message = await retry(() =>
     client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 200,
+      thinking: { type: "disabled" },
       messages: [
         {
           role: "user",

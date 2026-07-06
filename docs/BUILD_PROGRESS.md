@@ -1,6 +1,6 @@
 # DealDash Build Progress
 
-Last updated: 2026-07-04
+Last updated: 2026-07-06
 
 Project path: `C:\Users\admin\AI_Agent\dealdash`
 
@@ -14,8 +14,8 @@ Project path: `C:\Users\admin\AI_Agent\dealdash`
 | **Phase 3 Scraper** | **Complete (code)** | `npm run build` succeeds |
 | Phase 4 Admin portal | **Complete (code)** | `npm run build` succeeds |
 | Phase 5 CI/CD | **Complete (code)** | GitHub Actions workflows added |
-| Phase 6 Docs | Partial | SETUP, FLUTTER_SETUP, SUPABASE_SETUP, ADMIN_SETUP |
-| GitHub push | Pending | |
+| Phase 6 Docs | **Complete** | + ARCHITECTURE, API, SCRAPER added 2026-07-06 |
+| GitHub push | Pending | local repo only (commit c1cece4); no remote yet |
 
 ---
 
@@ -100,13 +100,27 @@ See `docs/ADMIN_SETUP.md` for full instructions.
 
 ---
 
+## Session 2026-07-06 — verification + polish
+
+- Verified all three apps build/analyze clean:
+  - `packages/scraper` — `npm run build` (tsc) exit 0
+  - `apps/admin` — `npm run build` exit 0 (14 routes)
+  - `apps/mobile` — `flutter analyze` → **No issues found!** (was 1 warning + 8 info)
+- Scraper LLM model: `claude-sonnet-4-6` → **`claude-sonnet-5`** in
+  `packages/scraper/src/ai/claude-normaliser.ts` (both call sites), with
+  `thinking: { type: "disabled" }` added — Sonnet 5 runs adaptive thinking by
+  default when the field is omitted, which this batch job doesn't need.
+- Fixed all 9 Flutter lints (unnecessary `?.` in splash_screen; `const` /
+  `unnecessary_const` in splash, home, subscription screens).
+- Added docs: `ARCHITECTURE.md`, `API.md`, `SCRAPER.md`.
+
 ## Next steps
 
-1. **Phase 5** — CI/CD workflows + root `.env.example`
-2. **Phase 6** — Complete docs (ARCHITECTURE.md, API.md, SCRAPER.md)
-3. **GitHub** — init repo and push
-4. **Configure admin `.env.local`** with Supabase keys
-5. **Test scraper** — add service role + API keys, run `npm run scrape`
+1. **GitHub** — add a remote and push (local repo has only commit c1cece4).
+2. **Configure admin `.env.local`** with Supabase keys.
+3. **Test scraper live** — add `SUPABASE_SERVICE_ROLE_KEY` + `ANTHROPIC_API_KEY` +
+   `FIRECRAWL_API_KEY`, run `npm run scrape` (one-off Woolworths).
+4. **Deploy** — Railway (scraper), Vercel (admin), TestFlight/Play (mobile).
 
 ---
 

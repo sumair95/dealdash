@@ -5,8 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
+import '../../../onboarding/providers/onboarding_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -46,7 +48,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _emailController.text.trim(),
             _passwordController.text,
           );
-      if (mounted) context.go('/onboarding/stores');
+      final userId = ref.read(supabaseServiceProvider).currentAuthUser?.id;
+      if (userId != null) {
+        await ref.read(onboardingProvider.notifier).saveAllPreferences(userId);
+      }
+      if (!mounted) return;
+      if (ref.read(onboardingProvider.notifier).isOnboardingComplete) {
+        context.go('/home');
+      } else {
+        context.go('/onboarding/stores');
+      }
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {

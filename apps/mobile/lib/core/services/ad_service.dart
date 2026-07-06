@@ -9,7 +9,7 @@ class AdService {
   bool _initialized = false;
 
   Future<void> init() async {
-    if (_initialized) return;
+    if (_initialized || kIsWeb) return;
     await MobileAds.instance.initialize();
     _initialized = true;
   }

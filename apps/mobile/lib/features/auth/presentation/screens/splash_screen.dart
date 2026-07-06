@@ -40,8 +40,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final auth = ref.read(authProvider).valueOrNull;
     if (auth?.status == AuthStatus.authenticated) {
       context.go('/home');
-    } else if (auth?.status == AuthStatus.unauthenticated) {
+    } else if (auth?.status == AuthStatus.unauthenticated ||
+        auth?.status == AuthStatus.loading ||
+        auth == null) {
       context.go('/onboarding');
+    } else if (auth.status == AuthStatus.error) {
+      context.go('/login');
     }
   }
 
@@ -82,7 +86,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   const SizedBox(height: 20),
                   Text(AppConstants.appName, style: Theme.of(context).textTheme.headlineMedium),
                   const SizedBox(height: 8),
-                  Text(AppStrings.splashTagline),
+                  const Text(AppStrings.splashTagline),
                 ],
               ),
             ),
