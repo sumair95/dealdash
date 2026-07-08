@@ -36,6 +36,19 @@ JSON structure for each product:
   "barcode": "string or null"
 }`;
 
+// Claude sometimes wraps the array in a prose preamble and/or a ```json fence
+// despite the system prompt. Extract the JSON array robustly before parsing so a
+// successful extraction isn't discarded over formatting.
+function extractJsonArray(text: string): unknown {
+  let t = text.trim();
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) t = fence[1].trim();
+  const start = t.indexOf("[");
+  const end = t.lastIndexOf("]");
+  if (start !== -1 && end !== -1 && end > start) t = t.slice(start, end + 1);
+  return JSON.parse(t);
+}
+
 export async function normaliseWithClaude(
   htmlContent: string,
   retailerName: string,
@@ -71,7 +84,7 @@ export async function normaliseWithClaude(
   const responseText = block.type === "text" ? block.text : "";
 
   try {
-    const products = JSON.parse(responseText) as ScrapedProduct[];
+    const products = extractJsonArray(responseText) as ScrapedProduct[];
     return Array.isArray(products) ? products : [];
   } catch {
     logger.error(
