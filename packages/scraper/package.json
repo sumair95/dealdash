@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@dealdash/scraper",
   "version": "1.0.0",
   "private": true,
@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "scrape": "tsx src/index.ts --once"
+    "dev": "tsx --env-file=.env src/index.ts",
+    "scrape": "tsx --env-file=.env src/index.ts --once"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
