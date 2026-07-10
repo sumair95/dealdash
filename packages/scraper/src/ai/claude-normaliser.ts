@@ -49,23 +49,17 @@ function extractJsonArray(text: string): unknown {
   return JSON.parse(t);
 }
 
-export async function normaliseWithClaude(
-  htmlContent: string,
+const MAX_CHUNK_SIZE = 50000;
+const MAX_CHUNKS = 8; // safety cap so a huge page can't run up unbounded cost
+
+async function extractChunk(
+  chunk: string,
   retailerName: string,
-  chunkIndex = 0,
 ): Promise<ScrapedProduct[]> {
-  const maxChunkSize = 50000;
-  const chunk = htmlContent.slice(
-    chunkIndex * maxChunkSize,
-    (chunkIndex + 1) * maxChunkSize,
-  );
-
-  if (!chunk) return [];
-
   const message = await retry(() =>
     client.messages.create({
       model: "claude-sonnet-5",
-      max_tokens: 4096,
+      max_tokens: 8192, // room for a full product array per chunk (was 4096)
       // Structured extraction against a fixed schema — no reasoning needed.
       // Sonnet 5 runs adaptive thinking when `thinking` is omitted, so disable
       // it explicitly to keep this nightly, high-volume call fast and cheap.
@@ -93,6 +87,30 @@ export async function normaliseWithClaude(
     );
     return [];
   }
+}
+
+// A retailer specials page usually exceeds one 50K-char chunk, so process the
+// whole page chunk by chunk and accumulate — otherwise every product past the
+// first chunk is silently lost.
+export async function normaliseWithClaude(
+  htmlContent: string,
+  retailerName: string,
+): Promise<ScrapedProduct[]> {
+  if (!htmlContent) return [];
+  const totalChunks = Math.min(
+    MAX_CHUNKS,
+    Math.max(1, Math.ceil(htmlContent.length / MAX_CHUNK_SIZE)),
+  );
+  const all: ScrapedProduct[] = [];
+  for (let i = 0; i < totalChunks; i++) {
+    const chunk = htmlContent.slice(
+      i * MAX_CHUNK_SIZE,
+      (i + 1) * MAX_CHUNK_SIZE,
+    );
+    if (!chunk) break;
+    all.push(...(await extractChunk(chunk, retailerName)));
+  }
+  return all;
 }
 
 export async function generateNotificationCopy(

@@ -10,9 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/scraper
+    # Map the secret to env here so it can be referenced in a step `if:`.
+    # `secrets` is NOT allowed directly in `if:` — doing so aborts the run with
+    # "No jobs were run".
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,16 +23,15 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: packages/scraper/package-lock.json
+          # npm workspaces: one lockfile at the repo root, not per package.
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - name: Install dependencies (workspaces)
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build scraper
+        run: npm run build --workspace packages/scraper
 
       - name: Deploy to Railway
-        if: ${{ secrets.RAILWAY_TOKEN != '' }}
+        if: ${{ env.RAILWAY_TOKEN != '' }}
         run: echo "Configure Railway CLI deploy with RAILWAY_TOKEN secret"
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
